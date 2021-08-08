@@ -4,6 +4,7 @@ from what_movie.model.imdb import IMDbDF
 from what_movie.utils.constants import OUTPUT_COLS, LANGUAGE_FILTER, \
     GENRE_FILTER, COLS_TO_NAMES
 
+
 def main(n, year_from, year_to):
     data = IMDbDF()
     data.filter_data(LANGUAGE_FILTER,
@@ -17,6 +18,7 @@ def main(n, year_from, year_to):
         print(f'{hyphens}\n{heading}\n{hyphens}')
         for col in OUTPUT_COLS:
             print(f'{COLS_TO_NAMES[col]}: {movies[i][col]}')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

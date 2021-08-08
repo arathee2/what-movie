@@ -33,5 +33,6 @@ python main.py -n 3 -f 2010 -t 2020
 # Uninstall
 ```buildoutcfg
 deactivate
-rm -r ${PROJECTPATH}
+rm -r $PROJECTPATH
+rm -r $VENVPATH
 ```
