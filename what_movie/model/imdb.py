@@ -5,22 +5,43 @@ abspath = op.abspath
 joinpath = op.join
 dirpath = op.dirname
 
+import pickle
 import random
 from typing import List
 
 import numpy as np
 import pandas as pd
 
-from what_movie.utils.paths import MOVIES_PATH, RATINGS_PATH
+from what_movie.utils.paths import IMDB_DATA_OBJ_PATH, MOVIES_PATH, RATINGS_PATH
 from what_movie.utils.constants import PRIMARY_KEY, TITLE_COL, SCORE_COL, \
-YEAR_COL, GENRE_COL, LANGUAGE_COL, OLDEST_YEAR, NEWEST_YEAR, NUM_VOTES, \
-MIN_NUM_VOTES, CONSIDER_TOP_N, OUTPUT_COLS
+    YEAR_COL, GENRE_COL, LANGUAGE_COL, OLDEST_YEAR, NEWEST_YEAR, NUM_VOTES, \
+    MIN_NUM_VOTES, CONSIDER_TOP_N, OUTPUT_COLS
 
 
 class IMDbDF():
     """Represents IMDb data."""
 
     def __init__(self):
+        if os.path.exists(IMDB_DATA_OBJ_PATH):
+            self._dataframe = self._from_pickle(IMDB_DATA_OBJ_PATH)
+        else:
+            self._dataframe = self._from_csvs()
+            self._dataframe = self._preprocess_data(self._dataframe)
+            self._to_pickle(self._dataframe, IMDB_DATA_OBJ_PATH)
+        self._CONSIDER_TOP_N = CONSIDER_TOP_N
+
+    def _from_pickle(self, path):
+        """Read object from file."""
+        with open(path, 'rb') as f:
+            return pickle.load(f)
+
+    def _to_pickle(self, obj, path):
+        """Write object to file."""
+        with open(path, 'wb') as f:
+            pickle.dump(obj, f)
+
+    def _from_csvs(self):
+        """Return pandas.DataFrame by combining movies.csv and ratings.csv."""
         # read movies csv
         MOVIE_COLS = [PRIMARY_KEY, TITLE_COL, YEAR_COL, GENRE_COL, LANGUAGE_COL]
         movies_df = pd.read_csv(MOVIES_PATH, low_memory=False)
@@ -33,50 +54,45 @@ class IMDbDF():
         rating_df = rating_df[RATING_COLS]
 
         # merge
-        self._dataframe = movies_df.merge(rating_df,
-                                          left_on=PRIMARY_KEY,
-                                          right_on=PRIMARY_KEY)
+        df = movies_df.merge(rating_df,
+                             left_on=PRIMARY_KEY,
+                             right_on=PRIMARY_KEY)
+        return df
 
-        # convert year values from string to integer
-        self._dataframe[YEAR_COL] = self._dataframe[YEAR_COL].\
-            apply(self.str_to_int)
-
-        # remove null values
+    def _preprocess_data(self, df):
+        """"""
+        df[YEAR_COL] = df[YEAR_COL].apply(self.str_to_int)
         for col in [TITLE_COL, YEAR_COL, SCORE_COL, LANGUAGE_COL]:
-            self._dataframe = \
-                self._dataframe[pd.notnull(self._dataframe[col])]
-        self._dataframe[YEAR_COL] = self._dataframe[YEAR_COL].apply(np.int32)
-        self._dataframe[LANGUAGE_COL] = self._dataframe[LANGUAGE_COL]. \
-            apply(self.to_set)
-        self._dataframe[GENRE_COL] = self._dataframe[GENRE_COL]. \
-            apply(self.to_set)
-        self._CONSIDER_TOP_N = CONSIDER_TOP_N
+            df = df[pd.notnull(df[col])]
+        df[YEAR_COL] = df[YEAR_COL].apply(np.int32)
+        df[LANGUAGE_COL] = df[LANGUAGE_COL].apply(self.to_set)
+        df[GENRE_COL] = df[GENRE_COL].apply(self.to_set)
+        return df
 
     def filter_data(self,
                     languages: List[str],
                     genres: List[str],
-                    year_from: int=OLDEST_YEAR,
-                    year_to: int=NEWEST_YEAR):
+                    year_from: int = OLDEST_YEAR,
+                    year_to: int = NEWEST_YEAR):
         """Filter data based on year, genre and language."""
 
         language_mask = self._dataframe[LANGUAGE_COL]. \
             apply(lambda x: self.contains(x, languages))
         self._dataframe = self._dataframe[language_mask]
-        genre_mask = self._dataframe[GENRE_COL].\
+        genre_mask = self._dataframe[GENRE_COL]. \
             apply(lambda x: self.contains(x, genres))
         self._dataframe = self._dataframe[genre_mask]
-        year_mask = (self._dataframe[YEAR_COL] <= year_to) &\
+        year_mask = (self._dataframe[YEAR_COL] <= year_to) & \
                     (self._dataframe[YEAR_COL] >= year_from)
         self._dataframe = self._dataframe[year_mask]
         num_votes_mask = self._dataframe[NUM_VOTES] > MIN_NUM_VOTES
         self._dataframe = self._dataframe[num_votes_mask]
 
-
     def sort_data(self):
         """Sort data based on movie rating."""
 
         self._dataframe = self._dataframe.sort_values(by=SCORE_COL,
-                                                      ascending=False).\
+                                                      ascending=False). \
             reset_index()
 
     def pick_top_movies(self, n):
