@@ -20,7 +20,7 @@ export PYTHONPATH=${PYTHONPATH}:${PROJECTPATH}/
 export VENVPATH=${HOME}/.what-movie
 python3 -m venv $VENVPATH
 source ${VENVPATH}/bin/activate
-pip install -r ${$PROJECTPATH}/requirements.txt
+pip install -r ${PROJECTPATH}/requirements.txt
 ```
 
 # Run
