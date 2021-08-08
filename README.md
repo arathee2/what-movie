@@ -27,7 +27,7 @@ pip install -r requirements.txt
 # Installation
 The following command shows 3 movies to watch between 2010 and 2020.
 ```buildoutcfg
-python what-movie/main.py -n 3 -f 2010 -t 2020
+python main.py -n 3 -f 2010 -t 2020
 ```
 
 # Uninstall
