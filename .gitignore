@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# dev files
+**/*.DS_Store
+.venv
+.idea
+.scratch.py
