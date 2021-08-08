@@ -8,7 +8,7 @@ export PROJECTPATH=${HOME}/what-movie
 git clone https://github.com/arathee2/what-movie.git ${PROJECTPATH}
 ```
 
-2. Install [pyenv](https://github.com/pyenv/pyenv#installation) and Python 3.9.6 or higher.
+2. [OPTIONAL] Install `pyenv` by following [these](https://github.com/pyenv/pyenv#installation) instructions and install Python 3.
 ```buildoutcfg
 pyenv install 3.9.6
 pyenv global 3.9.6
@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ```
 
 # Installation
-The following command shows 3 movies to watch between 2010 and 2020.
+The following command shows 3 movies to watch between 2010 and 2020. Output is stochastic and always shows high-rated movies.
 ```buildoutcfg
 python main.py -n 3 -f 2010 -t 2020
 ```
