@@ -20,15 +20,22 @@ export PYTHONPATH=${PYTHONPATH}:${PROJECTPATH}/
 export VENVPATH=${HOME}/.what-movie
 python3 -m venv $VENVPATH
 source ${VENVPATH}/bin/activate
-cd $PROJECTPATH
-pip install -r requirements.txt
+pip install -r ${$PROJECTPATH}/requirements.txt
 ```
 
 # Run
 The following command shows 3 movies to watch between 2010 and 2020. Output is stochastic and always shows high-rated movies.
 ```buildoutcfg
-python3 main.py -n 3 -f 2010 -t 2020
+python3 ${PROJECTPATH}/main.py -n 3 -f 2010 -t 2020
 ```
+
+# Usage
+```buildoutcfg
+python3 ${PROJECTPATH}/main.py --help
+```
+
+# Add Filters
+Set `LANGUAGE_FILTER` and `GENRE_FILTER` [here](https://github.com/arathee2/what-movie/blob/main/what_movie/utils/constants.py) to show movies that meet these criteria.
 
 # Uninstall
 ```buildoutcfg
@@ -36,6 +43,3 @@ deactivate
 rm -r $PROJECTPATH
 rm -r $VENVPATH
 ```
-
-# Add Filters
-Set `LANGUAGE_FILTER` and `GENRE_FILTER` [here](https://github.com/arathee2/what-movie/blob/main/what_movie/utils/constants.py) to show movies that meet these criteria.
