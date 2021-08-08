@@ -18,7 +18,7 @@ pyenv global 3.9.6
 ```buildoutcfg
 export PYTHONPATH=${PYTHONPATH}:${PROJECTPATH}/
 export VENVPATH=${HOME}/.what-movie
-python -m venv $VENVPATH
+python3 -m venv $VENVPATH
 source ${VENVPATH}/bin/activate
 cd $PROJECTPATH
 pip install -r requirements.txt
@@ -27,7 +27,7 @@ pip install -r requirements.txt
 # Run
 The following command shows 3 movies to watch between 2010 and 2020. Output is stochastic and always shows high-rated movies.
 ```buildoutcfg
-python main.py -n 3 -f 2010 -t 2020
+python3 main.py -n 3 -f 2010 -t 2020
 ```
 
 # Uninstall
