@@ -29,6 +29,8 @@ The following command shows 3 movies to watch between 2010 and 2020. Output is s
 python3 ${PROJECTPATH}/main.py -n 3 -f 2010 -t 2020
 ```
 
+Running the command for the first time takes a few seconds (~10 seconds on a MacBook Pro 13") but subsequent runs display the output instantaneously.
+
 # Usage
 ```buildoutcfg
 python3 ${PROJECTPATH}/main.py --help
@@ -43,3 +45,5 @@ deactivate
 rm -r $PROJECTPATH
 rm -r $VENVPATH
 ```
+
+Shoot an email to arathee2@gmail.com for feedback.
