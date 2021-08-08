@@ -36,3 +36,6 @@ deactivate
 rm -r $PROJECTPATH
 rm -r $VENVPATH
 ```
+
+# Add Filters
+Set `LANGUAGE_FILTER` and `GENRE_FILTER` [here](https://github.com/arathee2/what-movie/blob/main/what_movie/utils/constants.py) to show movies that meet these criteria.
