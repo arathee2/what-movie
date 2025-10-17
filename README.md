@@ -81,7 +81,7 @@ Language: english
 | Flag | Description | Default |
 | --- | --- | --- |
 | `-n`, `--num_movies` | Number of recommendations to return. | `3` |
-| `-f`, `--year_from` | Earliest release year to include. | `1800` |
+| `-f`, `--year_from` | Earliest release year to include. | `1894` |
 | `-t`, `--year_to` | Latest release year to include. | `2020` |
 
 Use `python main.py --help` to see the full argument list.
