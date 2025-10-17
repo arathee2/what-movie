@@ -36,7 +36,7 @@ NEWEST_YEAR = 2020
 MIN_NUM_VOTES = 1000
 CONSIDER_TOP_N = 100  # only consider top N movies (based on rating) while choosing recommendations
 DEFAULT_LANGUAGES: Tuple[str, ...] = ('english', 'hindi')
-DEFAULT_GENRES: Tuple[str, ...] = ('comedy', 'thriller', 'horror')
+DEFAULT_GENRES: Tuple[str, ...] = ('comedy', 'thriller', 'horror', 'sci-fi')
 
 COLUMN_LABELS: Mapping[str, str] = {
     TITLE_COL: 'Title',
