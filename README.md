@@ -88,8 +88,8 @@ Use `python main.py --help` to see the full argument list.
 
 ### Adjusting default filters
 The recommender ships with sensible defaults defined in `what_movie/utils/constants.py` (see the `DEFAULT_SETTINGS` dataclass):
-- `DEFAULT_LANGUAGES = ('english', 'hindi')  # case innsensitive`
-- `DEFAULT_GENRES = ('comedy', 'thriller', 'horror', 'sci-fi')  # case innsensitive`
+- `DEFAULT_LANGUAGES = ('english', 'hindi')  # case insensitive`
+- `DEFAULT_GENRES = ('comedy', 'thriller', 'horror', 'sci-fi')  # case insensitive`
 - `MIN_NUM_VOTES = 1000`
 - `CONSIDER_TOP_N = 100`
 
