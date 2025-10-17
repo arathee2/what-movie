@@ -23,6 +23,7 @@ class IMDbDF():
 
     def __init__(self):
         if os.path.exists(IMDB_DATA_OBJ_PATH):
+            print(f"Pickle object path: {IMDB_DATA_OBJ_PATH}")
             self._dataframe = self._from_pickle(IMDB_DATA_OBJ_PATH)
         else:
             self._dataframe = self._from_csvs()
