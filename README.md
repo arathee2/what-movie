@@ -1,12 +1,13 @@
 # What Movie
 
-Command-line helper that surfaces highly-rated IMDb titles that match the genres, languages and release window you care about. The project combines the public IMDb movie metadata and ratings datasets into a single pandas dataframe, applies filters, and then samples from the highest-rated results.
+Command-line helper that surfaces highly-rated IMDb titles that match the genres, languages and release window you care about. The project combines the public IMDb movie metadata and ratings datasets into a single pandas dataframe, applies filters, and then samples from the highest-rated results. The latest refactor wraps the workflow in reusable classes so the same engine can power scripts, notebooks, or the bundled CLI.
 
 ## Features
 - Filters the bundled IMDb movie dataset by language, genre, and release year.
 - Applies vote-count thresholds before ranking to avoid obscure titles with few votes.
 - Randomly samples from the top-rated slice to keep recommendations varied.
-- Caches a preprocessed dataframe (`data/processed_data.pkl`) so subsequent runs return almost instantly.
+- Caches a preprocessed dataframe (`data/processed_data.pkl`) so subsequent runs return almost instantly and automatically rebuilds the cache if it becomes incompatible.
+- Exposes an object-oriented API (`ImdbDataset`, `RecommendationSettings`, `MovieRecommender`) for programmatic use.
 
 ## Project Layout
 ```
@@ -15,8 +16,11 @@ Command-line helper that surfaces highly-rated IMDb titles that match the genres
 ├── main.py                 # CLI entry point
 ├── requirements.txt        # Runtime dependencies (numpy, pandas)
 └── what_movie/
-    ├── model/imdb.py       # Data loading, filtering, ranking logic
-    └── utils/              # Constants and common paths
+    ├── model/
+    │   └── imdb.py         # Dataset wrapper + recommender classes
+    └── utils/
+        ├── constants.py    # Default settings and column metadata
+        └── paths.py        # Filesystem helpers
 ```
 
 ## Getting Started
@@ -43,7 +47,7 @@ Command-line helper that surfaces highly-rated IMDb titles that match the genres
 
 The repository includes `data/movies.csv` and `data/ratings.csv` so you can start exploring immediately. Both CSVs come from the IMDb datasets (as distributed via Kaggle’s “IMDb movies” collection) and are subject to IMDb’s original licensing terms.
 
-## Usage
+## Usage (CLI)
 
 Run the recommender from the project root:
 
@@ -83,13 +87,32 @@ Language: english
 Use `python main.py --help` to see the full argument list.
 
 ### Adjusting default filters
-The recommender ships with sensible defaults defined in `what_movie/utils/constants.py`:
-- `LANGUAGE_FILTER = ['english', 'hindi']`
-- `GENRE_FILTER = ['comedy', 'thriller', 'horror']`
+The recommender ships with sensible defaults defined in `what_movie/utils/constants.py` (see the `DEFAULT_SETTINGS` dataclass):
+- `DEFAULT_LANGUAGES = ('english', 'hindi')`
+- `DEFAULT_GENRES = ('comedy', 'thriller', 'horror')`
 - `MIN_NUM_VOTES = 1000`
 - `CONSIDER_TOP_N = 100`
 
-Update those constants to narrow the pool of candidates or tweak how aggressively the app de-duplicates low-vote titles.
+Update those constants or instantiate your own `RecommendationSettings` to narrow the candidate pool or tweak how aggressively the app filters low-vote titles. Legacy aliases (`LANGUAGE_FILTER`, `GENRE_FILTER`, etc.) remain available for backwards compatibility.
+
+## Usage (Python API)
+
+You can import the recommender from your own scripts:
+
+```python
+from what_movie.model import MovieRecommender, RecommendationSettings
+
+settings = RecommendationSettings(
+    languages=["english"],
+    genres=["sci-fi", "thriller"],
+    year_from=2000,
+    year_to=2023,
+    min_votes=5000,
+)
+recommender = MovieRecommender(settings=settings)
+for movie in recommender.recommend(count=5):
+    print(movie.title, movie.year, movie.rating)
+```
 
 ## Regenerating the cached dataframe
 
@@ -97,14 +120,14 @@ To speed up subsequent runs, the first execution writes a processed pandas dataf
 - upgrade pandas and encounter a pickle compatibility error (for example `AttributeError: Can't get attribute 'new_block'`), or
 - want to rebuild the cache with modified filtering constants,
 
-delete the pickle and run the CLI again:
+delete the pickle and run the CLI again (or call `ImdbDataset().invalidate_cache()`):
 
 ```bash
 rm data/processed_data.pkl
 python main.py
 ```
 
-The dataframe will be reconstructed from the CSV sources using your current pandas version and constants.
+The dataframe will be reconstructed from the CSV sources using your current pandas version and constants. If the pickle cannot be read the project now refreshes it automatically.
 
 ## Development notes
 - The core logic lives in `what_movie/model/imdb.py` and is covered by docstrings. Light inline comments call out the trickier parts of the pandas pipeline.
