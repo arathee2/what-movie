@@ -1,3 +1,5 @@
+"""Static configuration values shared across the What Movie project."""
+
 PRIMARY_KEY = 'imdb_title_id'
 TITLE_COL = 'title'
 SCORE_COL = 'weighted_average_vote'

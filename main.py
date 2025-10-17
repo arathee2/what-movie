@@ -11,7 +11,7 @@ def main(n, year_from, year_to):
                      GENRE_FILTER,
                      year_from=year_from,
                      year_to=year_to)
-    movies = data.pick_top_movies(n=n)
+    movies = data.pick_top_movies(movie_count=n)
     for i in range(n):
         heading = f'Movie #{i + 1}'
         hyphens = '-' * len(heading)

@@ -1,10 +1,6 @@
+"""Helpers for loading, caching, and sampling IMDb metadata."""
+
 import os
-
-op = os.path
-abspath = op.abspath
-joinpath = op.join
-dirpath = op.dirname
-
 import pickle
 import random
 from typing import List
@@ -12,14 +8,17 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from what_movie.utils.paths import IMDB_DATA_OBJ_PATH, MOVIES_PATH, RATINGS_PATH
-from what_movie.utils.constants import PRIMARY_KEY, TITLE_COL, SCORE_COL, \
-    YEAR_COL, GENRE_COL, LANGUAGE_COL, OLDEST_YEAR, NEWEST_YEAR, NUM_VOTES, \
-    MIN_NUM_VOTES, CONSIDER_TOP_N, OUTPUT_COLS
+from what_movie.utils.constants import (CONSIDER_TOP_N, GENRE_COL,
+                                        LANGUAGE_COL, MIN_NUM_VOTES, NEWEST_YEAR,
+                                        NUM_VOTES, OLDEST_YEAR, OUTPUT_COLS,
+                                        PRIMARY_KEY, SCORE_COL, TITLE_COL,
+                                        YEAR_COL)
+from what_movie.utils.paths import (IMDB_DATA_OBJ_PATH, MOVIES_PATH,
+                                    RATINGS_PATH)
 
 
 class IMDbDF():
-    """Represents IMDb data."""
+    """Represents the IMDb dataset merged across metadata and ratings."""
 
     def __init__(self):
         if os.path.exists(IMDB_DATA_OBJ_PATH):
@@ -29,46 +28,48 @@ class IMDbDF():
             self._dataframe = self._from_csvs()
             self._dataframe = self._preprocess_data(self._dataframe)
             self._to_pickle(self._dataframe, IMDB_DATA_OBJ_PATH)
-        self._CONSIDER_TOP_N = CONSIDER_TOP_N
+        self._consider_top_n = CONSIDER_TOP_N
 
-    def _from_pickle(self, path):
+    @staticmethod
+    def _from_pickle(path):
         """Read object from file."""
-        with open(path, 'rb') as f:
-            return pickle.load(f)
+        with open(path, 'rb') as pickle_file:
+            return pickle.load(pickle_file)
 
-    def _to_pickle(self, obj, path):
+    @staticmethod
+    def _to_pickle(obj, path):
         """Write object to file."""
-        with open(path, 'wb') as f:
-            pickle.dump(obj, f)
+        with open(path, 'wb') as pickle_file:
+            pickle.dump(obj, pickle_file)
 
-    def _from_csvs(self):
+    @staticmethod
+    def _from_csvs():
         """Return pandas.DataFrame by combining movies.csv and ratings.csv."""
         # read movies csv
-        MOVIE_COLS = [PRIMARY_KEY, TITLE_COL, YEAR_COL, GENRE_COL, LANGUAGE_COL]
+        movie_cols = [PRIMARY_KEY, TITLE_COL, YEAR_COL, GENRE_COL, LANGUAGE_COL]
         movies_df = pd.read_csv(MOVIES_PATH, low_memory=False)
-        movies_df = movies_df[MOVIE_COLS]
+        movies_df = movies_df[movie_cols]
 
         # read ratings csv
-        RATING_COLS = [PRIMARY_KEY, SCORE_COL, NUM_VOTES]
-        rating_df = pd.read_csv(RATINGS_PATH,
-                                low_memory=False)
-        rating_df = rating_df[RATING_COLS]
+        rating_cols = [PRIMARY_KEY, SCORE_COL, NUM_VOTES]
+        rating_df = pd.read_csv(RATINGS_PATH, low_memory=False)
+        rating_df = rating_df[rating_cols]
 
         # merge
-        df = movies_df.merge(rating_df,
-                             left_on=PRIMARY_KEY,
-                             right_on=PRIMARY_KEY)
-        return df
+        merged_df = movies_df.merge(rating_df,
+                                    left_on=PRIMARY_KEY,
+                                    right_on=PRIMARY_KEY)
+        return merged_df
 
-    def _preprocess_data(self, df):
-        """"""
-        df[YEAR_COL] = df[YEAR_COL].apply(self.str_to_int)
+    def _preprocess_data(self, dataframe):
+        """Clean and normalize the dataframe columns used by the recommender."""
+        dataframe[YEAR_COL] = dataframe[YEAR_COL].apply(self.str_to_int)
         for col in [TITLE_COL, YEAR_COL, SCORE_COL, LANGUAGE_COL]:
-            df = df[pd.notnull(df[col])]
-        df[YEAR_COL] = df[YEAR_COL].apply(np.int32)
-        df[LANGUAGE_COL] = df[LANGUAGE_COL].apply(self.to_set)
-        df[GENRE_COL] = df[GENRE_COL].apply(self.to_set)
-        return df
+            dataframe = dataframe[pd.notnull(dataframe[col])]
+        dataframe[YEAR_COL] = dataframe[YEAR_COL].apply(np.int32)
+        dataframe[LANGUAGE_COL] = dataframe[LANGUAGE_COL].apply(self.to_set)
+        dataframe[GENRE_COL] = dataframe[GENRE_COL].apply(self.to_set)
+        return dataframe
 
     def filter_data(self,
                     languages: List[str],
@@ -96,41 +97,40 @@ class IMDbDF():
                                                       ascending=False). \
             reset_index()
 
-    def pick_top_movies(self, n):
+    def pick_top_movies(self, movie_count):
         """Return random movies names from highly-rated movies."""
-
         self.sort_data()
-        self._CONSIDER_TOP_N = min(self._CONSIDER_TOP_N, self._dataframe.shape[0])
-        movies = list()
-        picked_so_far = list()
-        while len(movies) != n:
-            random_value = random.choice(range(self._CONSIDER_TOP_N))
+        self._consider_top_n = min(self._consider_top_n, self._dataframe.shape[0])
+        movies = []
+        picked_so_far = []
+        while len(movies) != movie_count:
+            random_value = random.choice(range(self._consider_top_n))
             if random_value not in picked_so_far:
                 picked_so_far.append(random_value)
             else:
                 continue
-            movie = dict()
+            movie = {}
             for col in OUTPUT_COLS:
                 movie[col] = self._dataframe.loc[random_value, col]
             movies.append(movie)
         return movies
 
-    def to_set(self, items):
+    @staticmethod
+    def to_set(items):
         """Convert a comma-separated string to a set of words."""
         items = items.split(',')
         items = [item.strip().lower() for item in items]
         items = set(items)
         return items
 
-    def contains(self, A, B):
-        """Return True if set A and B have common elements."""
-        B = {item.lower() for item in B}
-        if A.intersection(B):
-            return True
-        else:
-            return False
+    @staticmethod
+    def contains(haystack, needles):
+        """Return True if ``haystack`` and ``needles`` share common elements."""
+        lower_needles = {item.lower() for item in needles}
+        return bool(haystack.intersection(lower_needles))
 
-    def str_to_int(self, string):
+    @staticmethod
+    def str_to_int(string):
         """Convert string to integer."""
         try:
             return int(string)

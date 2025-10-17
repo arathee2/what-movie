@@ -1,3 +1,5 @@
+"""Common filesystem paths for the What Movie dataset."""
+
 import os
 
 op = os.path
