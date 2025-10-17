@@ -88,12 +88,24 @@ Use `python main.py --help` to see the full argument list.
 
 ### Adjusting default filters
 The recommender ships with sensible defaults defined in `what_movie/utils/constants.py` (see the `DEFAULT_SETTINGS` dataclass):
-- `DEFAULT_LANGUAGES = ('english', 'hindi')`
-- `DEFAULT_GENRES = ('comedy', 'thriller', 'horror')`
+- `DEFAULT_LANGUAGES = ('english', 'hindi')  # case innsensitive`
+- `DEFAULT_GENRES = ('comedy', 'thriller', 'horror', 'sci-fi')  # case innsensitive`
 - `MIN_NUM_VOTES = 1000`
 - `CONSIDER_TOP_N = 100`
 
 Update those constants or instantiate your own `RecommendationSettings` to narrow the candidate pool or tweak how aggressively the app filters low-vote titles. Legacy aliases (`LANGUAGE_FILTER`, `GENRE_FILTER`, etc.) remain available for backwards compatibility.
+
+Here is a list of all the movie languages and genres. Note that the values in the `DEFAULT_LANGUAGES` and `DEFAULT_GENRES` are case insensitive. The values can also be found in `data/unique_genres_languages.json`.
+
+#### Languages:
+```
+Abkhazian, Aboriginal, Acholi, Afrikaans, Akan, Albanian, Algonquin, American Sign Language, Amharic, Ancient (to 1453), Apache languages, Arabic, Aragonese, Aramaic, Arapaho, Armenian, Aromanian, Assamese, Assyrian Neo-Aramaic, Athapascan languages, Australian Sign Language, Awadhi, Aymara, Azerbaijani, Bable, Balinese, Bambara, Basque, Belarusian, Bemba, Bengali, Berber languages, Bhojpuri, Bicolano, Bosnian, Brazilian Sign Language, Breton, British Sign Language, Bulgarian, Burmese, Cantonese, Catalan, Central American Indian languages, Chechen, Cheyenne, Chinese, Cornish, Corsican, Cree, Creek, Crimean Tatar, Croatian, Crow, Czech, Danish, Dari, Dinka, Dutch, Dyula, Dzongkha, Eastern Frisian, Egyptian (Ancient), English, Esperanto, Estonian, Ewe, Faroese, Filipino, Finnish, Flemish, French, French Sign Language, Frisian, Fulah, Gallegan, Georgian, German, German Sign Language, Greek, Greenlandic, Guarani, Gujarati, Gumatj, Haida, Haitian, Hakka, Haryanvi, Hassanya, Hausa, Hawaiian, Hebrew, Himachali, Hindi, Hmong, Hokkien, Hopi, Hungarian, Ibo, Icelandic, Indian Sign Language, Indonesian, Inuktitut, Irish, Italian, Japanese, Japanese Sign Language, Kabuverdianu, Kabyle, Kalmyk-Oirat, Kannada, Kashmiri, Kazakh, Khanty, Khmer, Kikuyu, Kinyarwanda, Kirghiz, Kirundi, Klingon, Konkani, Korean, Korean Sign Language, Kriolu, Kru, Kuna, Kurdish, Ladakhi, Ladino, Lao, Latin, Latvian, Lingala, Lithuanian, Low German, Luxembourgish, Macedonian, Maithili, Malay, Malayalam, Malinka, Maltese, Mandarin, Mandingo, Manipuri, Maori, Mapudungun, Marathi, Mari, Maya, Mende, Micmac, Middle English, Min Nan, Minangkabau, Mirandese, Mixtec, Mohawk, Mongolian, Montagnais, More, Nahuatl, Nama, Navajo, Neapolitan, Nenets, Nepali, Norse, North American Indian, Norwegian, Nyanja, Occitan, Ojibwa, Old, Old English, Oriya, Papiamento, Parsee, Pawnee, Persian, Peul, Polish, Polynesian, Portuguese, Pular, Punjabi, Purepecha, Pushto, Quechua, Quenya, Raeto-Romance, Rajasthani, Rhaetian, Romanian, Romany, Rotuman, Russian, Russian Sign Language, Ryukyuan, Saami, Samoan, Sanskrit, Sardinian, Scanian, Scots, Scottish Gaelic, Serbian, Serbo-Croatian, Shanghainese, Shanxi, Shona, Shoshoni, Sicilian, Sign Languages, Sindarin, Sindhi, Sinhalese, Sioux, Slovak, Slovenian, Somali, Songhay, Soninke, Southern Sotho, Spanish, Spanish Sign Language, Sranan, Swahili, Swedish, Swiss German, Syriac, Tagalog, Tajik, Tamashek, Tamil, Tarahumara, Tatar, Telugu, Teochew, Thai, Tibetan, Tigrigna, Tok Pisin, Tonga, Tswana, Tulu, Tupi, Turkish, Turkmen, Tzotzil, Uighur, Ukrainian, Ukrainian Sign Language, Ungwatsi, Urdu, Uzbek, Vietnamese, Visayan, Washoe, Wayuu, Welsh, Wolof, Xhosa, Yakut, Yiddish, Yoruba, Zulu
+```
+
+#### Genres:
+```
+Action, Adult, Adventure, Animation, Biography, Comedy, Crime, Documentary, Drama, Family, Fantasy, Film-Noir, History, Horror, Music, Musical, Mystery, News, Reality-TV, Romance, Sci-Fi, Sport, Thriller, War, Western
+```
 
 ## Usage (Python API)
 
